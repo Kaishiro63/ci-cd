@@ -6,11 +6,52 @@ on:
   push:
     branches:
       - main
+      - '*'
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  Deploy-Production:
+  Deploy-Preview:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install @actions/github
+        run: npm install @actions/github
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        id: vercel_deploy
+      - name: Comment PR with Preview URL
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { context, getOctokit } = require('@actions/github');
+            const octokit = getOctokit(process.env.GITHUB_TOKEN);
+            const url = '${{ steps.vercel_deploy.outputs.url }}';
+            octokit.rest.issues.createComment({
+              issue_number: context.payload.pull_request.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Preview URL: ' + url
+            });
+
+  Deploy-Production:
+    if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install @actions/github
+        run: npm install @actions/github
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information
