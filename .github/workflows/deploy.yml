@@ -33,12 +33,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { context, github } = require('@actions/github');
+            const { github } = require('@actions/github');
             const url = '${{ steps.vercel_deploy.outputs.url }}';
             github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+              issue_number: github.context.issue.number,
+              owner: github.context.repo.owner,
+              repo: github.context.repo.repo,
               body: 'Preview URL: ' + url
             });
 
