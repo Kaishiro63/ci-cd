@@ -33,12 +33,14 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const { context, github } = require('@actions/github');
+            const url = '${{ steps.vercel_deploy.outputs.url }}';
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'Preview URL: ' + ${{ steps.vercel_deploy.outputs.url }}
-            })
+              body: 'Preview URL: ' + url
+            });
 
   Deploy-Production:
     if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
