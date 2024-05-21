@@ -15,7 +15,10 @@ on:
 jobs:
   deploy-preview:
     if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
       - name: Install Vercel CLI
@@ -34,7 +37,7 @@ jobs:
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: "Hey! here is your preview url : ${{ steps.deploy.outputs.url }}"
+                body: "Preview url : ${{ steps.deploy.outputs.url }}"
               })
 
   deploy-production:
