@@ -14,7 +14,6 @@ on:
 
 jobs:
   deploy-preview:
-    if: github.event_name == 'pull_request'
     permissions:
       pull-requests: write
     runs-on: ubuntu-latest
