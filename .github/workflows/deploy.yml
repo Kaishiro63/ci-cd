@@ -26,21 +26,16 @@ jobs:
         id: vercel_deploy
         run: vercel --token=${{ secrets.VERCEL_TOKEN }}
       - name: Comment PR with Preview URL
-        uses: actions/github-script@v4
+        uses: actions/github-script@v3
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const deploymentUrl = '${{ steps.vercel_deploy.outputs.url }}';
-            const prNumber = context.payload.pull_request.number;
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const comment = `Preview URL: ${deploymentUrl}`;
-            await github.rest.issues.createComment({
-              owner: owner,
-              repo: repo,
-              issue_number: prNumber,
-              body: comment
-            });
+            github-token: ${{secrets.GITHUB_TOKEN}}
+            script: |
+              github.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: "Hey! here is your preview url : ${{ steps.deploy.outputs.url }}"
+              })
 
   deploy-production:
     if: github.ref == 'refs/heads/main' && github.event.pull_request.merged == true
