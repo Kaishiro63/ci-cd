@@ -10,15 +10,6 @@ on:
   schedule:
     - cron: 37 20 * * *
 name: Semgrep
-rules:
-  - id: html-js
-    name: HTML and JavaScript Rules
-    languages:
-      - javascript
-      - html
-    severity: ERROR
-    message: "Violation of HTML and JavaScript rules found"
-    path: "https://semgrep.dev/p/html-js"
 jobs:
   semgrep:
     name: semgrep/ci
