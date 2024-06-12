@@ -16,13 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Install Semgrep
       - name: Install Semgrep
         run: pip install semgrep
 
-      # Run Semgrep with security rules
       - name: Run Semgrep
-        run: semgrep --config "p/r2c-ci" .
+        run: semgrep --config=p/semgrep.yml
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
