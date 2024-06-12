@@ -13,4 +13,35 @@ jobs:
       image: returntocorp/semgrep
     steps:
       - uses: actions/checkout@v3
-      - run: semgrep ci
+
+      - name: Run Semgrep
+        id: semgrep
+        run: |
+          semgrep ci --json > semgrep_results.json || exit 0
+
+      - name: Check Semgrep results
+        id: check_semgrep
+        run: |
+          if grep -q '"results": \[\]' semgrep_results.json; then
+            echo "No Semgrep issues found."
+          else
+            echo "Semgrep issues found."
+            exit 1
+          fi
+
+      - name: Post comment on PR with JSON results
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const jsonContent = fs.readFileSync('semgrep_results.json', 'utf8');
+            const issue_number = context.payload.pull_request.number;
+            const body = `## Semgrep found issues in your code:\n\n\`\`\`json\n${jsonContent}\n\`\`\``;
+            github.issues.createComment({
+              issue_number: issue_number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
