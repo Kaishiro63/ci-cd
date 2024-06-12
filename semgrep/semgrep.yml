@@ -11,18 +11,19 @@ on:
   - cron: 37 20 * * *
 name: Semgrep
 rules:
-  - id: detect-xss
-    name: Detect potential XSS (Cross-Site Scripting) vulnerabilities
-    message: "Potential XSS vulnerability detected: $@payload"
-    severity: ERROR
+  - id: html-js
+    name: HTML and JavaScript Rules
     languages:
       - javascript
-    patterns:
-      - pattern: "document.write($...)"
-      - pattern: "document.writeln($...)"
-      - pattern: "innerHTML\s*=\s*$..."
-      - pattern: "setAttribute\s*\(\s*\"(?:src|href)\"\s*,\s*$..."
-
+      - html
+    severity: ERROR
+    path: "https://semgrep.dev/p/html-js"
+- id: your-rule-id
+  patterns:
+  - pattern: |
+      your-pattern
+  languages:
+  - javascript
 jobs:
   semgrep:
     name: semgrep/ci
