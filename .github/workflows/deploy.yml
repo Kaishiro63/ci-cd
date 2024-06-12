@@ -20,7 +20,7 @@ jobs:
         run: pip install semgrep
 
       - name: Run Semgrep
-        run: semgrep --config=semgrep.yml
+        run: semgrep --config=.github/workflows/semgrep.yml
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
