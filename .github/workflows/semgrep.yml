@@ -1,8 +1,10 @@
+name: Semgrep
+
 on:
   pull_request:
     branches:
       - "main"
-name: Semgrep
+
 jobs:
   semgrep:
     name: semgrep/ci
@@ -17,31 +19,28 @@ jobs:
       - name: Run Semgrep
         id: semgrep
         run: |
-          semgrep ci --json > semgrep_results.json || exit 0
+          semgrep ci --json > semgrep_results.json
 
-      - name: Check Semgrep results
-        id: check_semgrep
-        run: |
-          if grep -q '"results": \[\]' semgrep_results.json; then
-            echo "No Semgrep issues found."
-          else
-            echo "Semgrep issues found."
-            exit 1
-          fi
-
-      - name: Post comment on PR with JSON results
+      - name: Check and Comment on blocking issues
         if: failure()
-        uses: actions/github-script@v6
+        uses: actions/github-script@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const jsonContent = fs.readFileSync('semgrep_results.json', 'utf8');
-            const issue_number = context.payload.pull_request.number;
-            const body = `## Semgrep found issues in your code:\n\n\`\`\`json\n${jsonContent}\n\`\`\``;
-            github.issues.createComment({
-              issue_number: issue_number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            });
+            const semgrepResults = JSON.parse(fs.readFileSync('semgrep_results.json', 'utf8'));
+
+            let issueDetails = '';
+            if (semgrepResults.results && semgrepResults.results.length > 0) {
+              issueDetails = semgrepResults.results.map(result => {
+                return `${result.check_id}: ${result.extra.message} at ${result.path}:${result.start.line}`;
+              }).join('\n');
+
+              const body = `Blocking issues detected. Please review the code:\n${issueDetails}`;
+              github.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            }
