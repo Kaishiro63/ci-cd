@@ -2,12 +2,13 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Formulaire de contact</title>
+    <title>Contact Form</title>
 </head>
 <body>
-    <h1>TEST</h1>
+    <h1>Contact Us</h1>
     <form id="contactForm" method="post" action="/submit">
-        <label for="name">Nom :</label>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" value="<script>alert('XSS');</script>">
         <input type="submit" value="Submit">
     </form>
 
