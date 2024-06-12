@@ -17,6 +17,7 @@ rules:
       - javascript
       - html
     severity: ERROR
+    message: "Violation of HTML and JavaScript rules found"
     path: "https://semgrep.dev/p/html-js"
 jobs:
   semgrep:
