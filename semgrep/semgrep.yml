@@ -3,12 +3,12 @@ on:
   pull_request: {}
   push:
     branches:
-    - main
-    - master
+      - main
+      - master
     paths:
-    - .github/workflows/semgrep.yml
+      - .github/workflows/semgrep.yml
   schedule:
-  - cron: 37 20 * * *
+    - cron: 37 20 * * *
 name: Semgrep
 rules:
   - id: html-js
@@ -18,12 +18,6 @@ rules:
       - html
     severity: ERROR
     path: "https://semgrep.dev/p/html-js"
-- id: your-rule-id
-  patterns:
-  - pattern: |
-      your-pattern
-  languages:
-  - javascript
 jobs:
   semgrep:
     name: semgrep/ci
@@ -33,5 +27,5 @@ jobs:
     container:
       image: returntocorp/semgrep
     steps:
-    - uses: actions/checkout@v3
-    - run: semgrep ci
+      - uses: actions/checkout@v3
+      - run: semgrep ci
