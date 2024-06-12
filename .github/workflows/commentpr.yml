@@ -1,0 +1,34 @@
+name: Post Deployment Comment
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  post_comment:
+    name: Post comment with production link
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Post comment on closed PR
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const productionLink = 'https://ci-cd-bay.vercel.app/';
+            const prNumber = context.payload.pull_request.number;
+
+            github.issues.createComment({
+              issue_number: prNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `The pull request has been merged. You can view the production deployment [here](${productionLink}).`
+            });
