@@ -10,6 +10,26 @@ on:
   schedule:
   - cron: 37 20 * * *
 name: Semgrep
+rules:
+  - id: detect-xss
+    name: Detect XSS Vulnerabilities
+    message: "Potential XSS vulnerability found."
+    severity: ERROR
+    languages:
+      - javascript
+    patterns:
+      - pattern: >
+          document\.write\s*\(
+          |
+          eval\s*\(
+          |
+          innerHTML\s*=
+      capture:
+        0: { name: "sink", pattern: "(?:document\.write\s*\(|eval\s*\(|innerHTML\s*=)" }
+    annotators:
+      - category: "security"
+        message: "Potential XSS vulnerability found."
+        range: "sink"
 jobs:
   semgrep:
     name: semgrep/ci
